@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const userRouter = require('./routes/userRouter.js');
 const connectDB = require('./config/db.js');
 const dotenv = require('dotenv');
@@ -11,8 +12,15 @@ app.use(express.json());
 
 app.use('/api/users', userRouter);
 
+
+//create http server
+const server = http.createServer(app);
+
+//initialize socket.io
+require('./sockets/index.js')(server);
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 }
 );
