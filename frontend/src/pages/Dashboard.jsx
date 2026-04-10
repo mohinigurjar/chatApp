@@ -15,6 +15,14 @@ const Dashboard = () => {
       console.log("Socket connected:", socket.id);
     });
 
+    socket.on("me", (data) => {
+      console.log("My userId:", data.userId);
+    });
+
+    socket.on("receive_message", (messageData) => {
+      console.log("Received message: ", messageData);
+    })
+
     socket.on("onlineUsers", (count) => {
       console.log("Online users event recieved:", count);
       setOnlineUsers(count);

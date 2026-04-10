@@ -3,7 +3,9 @@ const jwt = require("jsonwebtoken");
 // const cors = require("cors");
 const cookie = require("cookie"); //parses cookies from request header
 
-
+function getRoomId(user1, user2){
+    return [user1, user2].sort().join("_");
+}
 
 //this function receives the http server(http) created in app.js as argument and attaches socket.io server to it
 module.exports = function(server) {
@@ -64,6 +66,35 @@ module.exports = function(server) {
 
         //emit to all clients when someone connects
         io.emit("onlineUsers", onlineUsers.size);
+        //sending userid
+        socket.emit("me", { userId: socket.userId });
+
+        socket.on("join_room", ({ otherUserId }) => {
+            const roomId = getRoomId(socket.userId, otherUserId);
+            socket.join(roomId);
+            console.log(`User ${socket.userId} joined room ${roomId}`);
+            console.log("JOIN ROOM:");
+            console.log("User:", socket.userId);
+            console.log("Other:", otherUserId);
+            console.log("Room:", roomId);
+        })
+
+        socket.on("send_message", ({ otherUserId, message }) => {
+            const roomId = getRoomId(socket.userId, otherUserId);
+            console.log("MESSAGE EVENT:");
+            console.log("From:", socket.userId);
+            console.log("To:", otherUserId);
+            console.log("Room:", roomId);
+            console.log("Message:", message);
+
+            const messageData = {
+                senderId: socket.userId,
+                message,
+                timestamp: Date.now()
+            };
+
+            io.to(roomId).emit("receive_message", messageData);
+        })
 
         socket.on("disconnect", () => {
             // console.log(`User disconnected: ${socket.userId}`);
