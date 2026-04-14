@@ -2,6 +2,8 @@ const { Server } = require("socket.io"); //create a websocket server
 const jwt = require("jsonwebtoken");
 // const cors = require("cors");
 const cookie = require("cookie"); //parses cookies from request header
+const Message = require("../models/messages");
+const {saveMessage} = require("../services/messageService")
 
 function getRoomId(user1, user2){
     return [user1, user2].sort().join("_");
@@ -79,25 +81,34 @@ module.exports = function(server) {
             console.log("Room:", roomId);
         })
 
-        socket.on("send_message", ({ otherUserId, message }) => {
-            const roomId = getRoomId(socket.userId, otherUserId);
-            console.log("MESSAGE EVENT:");
-            console.log("From:", socket.userId);
-            console.log("To:", otherUserId);
-            console.log("Room:", roomId);
-            console.log("Message:", message);
+        socket.on("send_message", async({ otherUserId, message }) => {
+            try{
+                console.log("send_message working");
+                const roomId = getRoomId(socket.userId, otherUserId);
+                console.log("MESSAGE EVENT:");
+                console.log("From:", socket.userId);
+                console.log("To:", otherUserId);
+                console.log("Room:", roomId);
+                console.log("Message:", message);
 
-            const messageData = {
-                senderId: socket.userId,
-                message,
-                timestamp: Date.now()
-            };
+                const messageData = await saveMessage({
+                    roomId,
+                    sender: socket.userId,
+                    receiver: otherUserId,
+                    message,
+                })
 
-            io.to(roomId).emit("receive_message", messageData);
+                console.log("message saved");
+
+                io.to(roomId).emit("receive_message", messageData);
+
+            }catch(error){
+                console.log(error.message);
+            }
+            
         })
 
         socket.on("disconnect", () => {
-            // console.log(`User disconnected: ${socket.userId}`);
 
             const userSockets = onlineUsers.get(userId);
 
@@ -119,4 +130,4 @@ module.exports = function(server) {
     });
 }
 
-//todo: create fronteend to get online users data
+//todo: create fronteend for chats

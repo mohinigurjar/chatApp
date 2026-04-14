@@ -12,9 +12,9 @@ const userAuth = async(req, res, next) => {
         // decoding to get the payload ultimately the user id
         const decodedObj = await jwt.verify(token, process.env.JWT_SECRET);
 
-        const { _id } = decodedObj;
+        const { id } = decodedObj;
 
-        const user = await User.findById(_id);
+        const user = await User.findById(id);
         
         if(!user){
             throw new Error("User not found");
