@@ -71,6 +71,15 @@ module.exports = function(server) {
         //sending userid
         socket.emit("me", { userId: socket.userId });
 
+
+        socket.on("all_users", ({}) => {
+            const countAll = onlineUsers.size;
+            const users = Array.from(onlineUsers.keys());
+            console.log("All users", countAll);
+            console.log(users);
+
+        })
+
         socket.on("join_room", ({ otherUserId }) => {
             const roomId = getRoomId(socket.userId, otherUserId);
             socket.join(roomId);

@@ -38,8 +38,47 @@ const loginUser = async(req, res) => {
             return res.status(401).json({error: 'Invalid credentials'});
         }
     }catch(error) {
+        console.log(error);
         return res.status(400).send({"ERROR ": + error.message});
     }
 }
 
-module.exports = { createUser, loginUser };
+const getUserProfile = async(req, res) => {
+    const { userId } = req.params;
+    
+    
+    try{
+        const user = await User.findOne({ _id: userId});
+        // console.log(userId);
+
+        if(!user){
+            return res.status(404).json({message: 'user not found'});
+        }
+        else{
+            return res.status(200).json({messsage: 'user details', user});
+        }
+    }catch(error) {
+        return res.status(400).send({"ERROR: ": + error.message})
+    }
+}
+
+const getAllLoggedInUsersDetails = async(req, res) => {
+    const { ids } = req.body;
+    console.log(ids);
+
+    try{
+        const users = await User.find({
+            _id: { $in: ids }
+        });
+
+        console.log(users);
+
+        res.status(200).json(users);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({error: error.message});
+    }
+}
+
+
+module.exports = { createUser, loginUser, getUserProfile, getAllLoggedInUsersDetails };

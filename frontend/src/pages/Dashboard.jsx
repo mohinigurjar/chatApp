@@ -4,6 +4,8 @@ import { socket } from "../socket";
 const Dashboard = () => {
   const [status, setStatus] = useState("disconnected");
   const [socketId, setSocketId] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [message, setMessage] = useState("");
   const [onlineUsers, setOnlineUsers] = useState(0);
 
   useEffect(() => {
@@ -17,10 +19,12 @@ const Dashboard = () => {
 
     socket.on("me", (data) => {
       console.log("My userId:", data.userId);
+      setUserId(data.userId);
     });
 
     socket.on("receive_message", (messageData) => {
       console.log("Received message: ", messageData);
+      setMessage(messageData.message);
     })
 
     socket.on("onlineUsers", (count) => {
@@ -50,6 +54,10 @@ const Dashboard = () => {
       <p>Status: {status}</p>
       {socketId && <p>Socket ID: {socketId}</p>}
       <p>Online Users: {onlineUsers}</p>
+      <p>User ID: {userId}</p>
+      {/* <p>Last message: {message}</p> */}
+
+      <button>Chats</button>
     </div>
   );
 };
