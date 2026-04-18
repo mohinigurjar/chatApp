@@ -27,7 +27,7 @@ const Dashboard = () => {
       setMessage(messageData.message);
     })
 
-    socket.on("onlineUsers", (count) => {
+    socket.on("online_users_count", (count) => {
       console.log("Online users event recieved:", count);
       setOnlineUsers(count);
     });
@@ -43,7 +43,7 @@ const Dashboard = () => {
     });
 
     return () => {
-      socket.off("onlineUsers");
+      socket.off("me");
       socket.disconnect();
     };
   }, []);
