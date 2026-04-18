@@ -12,11 +12,12 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/sidebar"
-        element={isLoggedIn ? <Sidebar /> : <Navigate to="/login" />}
+        path="/login"
+        element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route path="*" element={<Navigate to="/login" />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/dashboard" element={<Dashboard/>} />
       <Route path="/sidebar" element={<Sidebar />}></Route>
     </Routes>
   );

@@ -67,7 +67,9 @@ module.exports = function(server) {
         console.log("Users online: ", onlineUsers.size);
 
         //emit to all clients when someone connects
-        io.emit("onlineUsers", onlineUsers.size);
+        io.emit("online_users_count", onlineUsers.size);
+        //emit the userIds of all the online users
+        io.emit("online_users", Array.from(onlineUsers.keys()));
         //sending userid
         socket.emit("me", { userId: socket.userId });
 
@@ -133,7 +135,8 @@ module.exports = function(server) {
             console.log("User disconnected: ", userId);
 
             //emit updated count when someone disconnects
-            io.emit("onlineUsers", onlineUsers.size);
+            io.emit("online_users_count", onlineUsers.size);
+            io.emit("online_users", Array(onlineUsers.keys()));
 
         });
     });
