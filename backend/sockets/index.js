@@ -69,7 +69,7 @@ module.exports = function(server) {
         //emit to all clients when someone connects
         io.emit("online_users_count", onlineUsers.size);
         //emit the userIds of all the online users
-        io.emit("online_users", Array(onlineUsers.keys()));
+        io.emit("online_users", Array.from(onlineUsers.keys()));
         //sending userid
         socket.emit("me", { userId: socket.userId });
 
