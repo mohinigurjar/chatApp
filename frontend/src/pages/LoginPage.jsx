@@ -26,7 +26,7 @@ const LoginPage = () => {
 
         try{
             const response = await loginUser(data);
-            navigate("/dashboard");
+            navigate("/sidebar");
             console.log("Login successful:", response.data);
         } catch(err) {
             setError("Invalid credentials");

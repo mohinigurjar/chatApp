@@ -12,8 +12,8 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/login"
-        element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />}
+        path="/sidebar"
+        element={isLoggedIn ? <Sidebar /> : <Navigate to="/login" />}
       />
       <Route path="*" element={<Navigate to="/login" />} />
       <Route path="/signup" element={<SignupPage />} />

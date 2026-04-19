@@ -1,4 +1,5 @@
 const { Server } = require("socket.io"); //create a websocket server
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 // const cors = require("cors");
 const cookie = require("cookie"); //parses cookies from request header
@@ -69,7 +70,9 @@ module.exports = function(server) {
         //emit to all clients when someone connects
         io.emit("online_users_count", onlineUsers.size);
         //emit the userIds of all the online users
-        io.emit("online_users", Array.from(onlineUsers.keys()));
+        io.emit("online_users", Array.from(onlineUsers.keys()).filter(id => 
+            mongoose.Types.ObjectId.isValid(id)
+        ));
         //sending userid
         socket.emit("me", { userId: socket.userId });
 
@@ -90,6 +93,7 @@ module.exports = function(server) {
             console.log("User:", socket.userId);
             console.log("Other:", otherUserId);
             console.log("Room:", roomId);
+            socket.emit("room_joined", roomId);
         })
 
         socket.on("send_message", async({ otherUserId, message }) => {
@@ -136,7 +140,9 @@ module.exports = function(server) {
 
             //emit updated count when someone disconnects
             io.emit("online_users_count", onlineUsers.size);
-            io.emit("online_users", Array(onlineUsers.keys()));
+            io.emit("online_users", Array.from(onlineUsers.keys()).filter(id => 
+                mongoose.Types.ObjectId.isValid(id)
+            ));
 
         });
     });
