@@ -93,6 +93,7 @@ module.exports = function(server) {
             console.log("User:", socket.userId);
             console.log("Other:", otherUserId);
             console.log("Room:", roomId);
+            socket.emit("room_joined", roomId);
         })
 
         socket.on("send_message", async({ otherUserId, message }) => {

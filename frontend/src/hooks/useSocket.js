@@ -1,11 +1,17 @@
 import { getUser, getUserByIds } from "../services/api";
 import { socket } from "../socket"
 import { useEffect } from "react";
+import { useChatStore } from "../store/chatStore";
 
-export const useSocket = ({setCurrentUser, setOnlineUsersList}) => {
+export const useSocket = () => {
+    const  setCurrentUser  = useChatStore(state => state.setCurrentUser);
+    const  setOnlineUsersList  = useChatStore(state => state.setOnlineUsersList);
+
 
     useEffect(() => {
         socket.connect();
+
+        setCurrentUser(null);
 
         //.on - argument - data we rcv
         //.emit - argument - data we send
@@ -57,6 +63,10 @@ export const useSocket = ({setCurrentUser, setOnlineUsersList}) => {
 
         })
 
+        socket.on("room_joined", (roomId) => {
+            console.log("Room joined: ", roomId );
+        })
+
         return () => {
             socket.off("me");
             socket.off("online_users");
@@ -64,4 +74,11 @@ export const useSocket = ({setCurrentUser, setOnlineUsersList}) => {
         }
 
     }, []);
+
+    const joinRoom = (otherUserId) => {
+    socket.emit("join_room", { otherUserId });
+    }
+
+    return { joinRoom } ;
 }
+

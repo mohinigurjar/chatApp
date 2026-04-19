@@ -1,18 +1,21 @@
-import { useChat } from "../context/ChatContext"
+import { useChatStore } from "../store/chatStore";
+import { useSocket } from "../hooks/useSocket"
 
 const Sidebar = () => {
-    const { currentUser, onlineUsersList } = useChat();
+    const currentUser = useChatStore(state => state.currentUser);
+    const onlineUsersList = useChatStore(state => state.onlineUsersList);
+    const {joinRoom} = useSocket();
+
+    const handleSelectedUser = (user) => {
+        joinRoom(user._id); 
+    }
 
     return (
         <div>
             <div className="flex justify-between">
                 <div>
                     <h3 className="text-red-700">{currentUser?.username}</h3>
-                    {/* <h5>{user.online ? <span>😁</span> : <span>😒</span>}</h5> */}
-
-                    
-
-
+                    {/* <h5>online status of current user</h5> */}
                 </div>
                 <div>
                     <a href="/login">
@@ -35,7 +38,10 @@ const Sidebar = () => {
                         <ul>
                             {onlineUsersList
                             .filter(user => currentUser?._id && user._id.toString() !== currentUser._id.toString())
-                            .map((user) => <li key={user._id}>{user.username}</li>)}
+                            .map((user) => <li 
+                            key={user._id}
+                            onClick={() => handleSelectedUser(user)}
+                            className="cursor-pointer">{user.username}</li>)}
                         </ul>
                     </div>
                 <div>online status</div>
