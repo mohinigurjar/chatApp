@@ -15,7 +15,9 @@ const Sidebar = () => {
 
                 </div>
                 <div>
-                    <button>logout</button>
+                    <a href="/login">
+                      <button>logout</button>
+                    </a>
                 </div>
             </div>
         <hr></hr>
@@ -31,9 +33,9 @@ const Sidebar = () => {
                 <div>
                         <h3>Online users: </h3>
                         <ul>
-                            {onlineUsersList.map((user) => (
-                            <li key={user._id}>{user.username}</li>
-                            ))}
+                            {onlineUsersList
+                            .filter(user => currentUser?._id && user._id.toString() !== currentUser._id.toString())
+                            .map((user) => <li key={user._id}>{user.username}</li>)}
                         </ul>
                     </div>
                 <div>online status</div>

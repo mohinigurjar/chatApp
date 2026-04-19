@@ -7,6 +7,8 @@ export const useSocket = ({setCurrentUser, setOnlineUsersList}) => {
     useEffect(() => {
         socket.connect();
 
+        //.on - argument - data we rcv
+        //.emit - argument - data we send
         socket.on("me", async(data) => { //here we used data instead of userId because on me event we receive a object as response
             const userId = data.userId;
 
@@ -26,16 +28,26 @@ export const useSocket = ({setCurrentUser, setOnlineUsersList}) => {
         })
 
         socket.on("online_users", async(ids) => { //we receive array of ids from this event from backend
-            
-            if(!ids || ids.length === 0){
+
+            if(!Array.isArray(ids) || ids.length === 0){
                 setOnlineUsersList([]);
                 return;
             }
+            console.log("Raw ids: ", ids);
 
-            console.log("Ids are: ", ids);
+            const cleanIds = ids.filter(id=>
+                typeof(id) === "string" && id.length === 24
+            );
+
+            if(cleanIds.length === 0){
+                setOnlineUsersList([]);
+                return;
+            }
+           
+            console.log("clean Ids are: ", cleanIds);
 
             try{
-                const res = await getUserByIds(ids);
+                const res = await getUserByIds(cleanIds);
                 const users = res.data;
                 console.log("Online users list: ", users);
                 setOnlineUsersList(users);

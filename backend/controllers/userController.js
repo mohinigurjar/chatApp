@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/users.js');
+const mongoose = require("mongoose");
 
 const bcrypt = require('bcrypt');
 
@@ -64,11 +65,15 @@ const getUserProfile = async(req, res) => {
 
 const getAllLoggedInUsersDetails = async(req, res) => {
     const { ids } = req.body;
-    console.log(ids);
+
+    //prevent from getting bad ids like [], [{}] as they crash during query
+    const validIds = ids.filter((id) => 
+    mongoose.Types.ObjectId.isValid(id)
+    );
 
     try{
         const users = await User.find({
-            _id: { $in: ids }
+            _id: { $in: validIds }
         });
 
         console.log(users);
