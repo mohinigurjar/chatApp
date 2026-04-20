@@ -22,7 +22,7 @@ function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/dashboard" element={<Dashboard/>} />
       <Route path="/sidebar" element={<Sidebar />}></Route>
-      <Route path="/chatWindow" element={<ChatWindow/>}></Route>
+      <Route path="/chatWindow/:userId" element={<ChatWindow/>}></Route>
     </Routes>
   );
 }

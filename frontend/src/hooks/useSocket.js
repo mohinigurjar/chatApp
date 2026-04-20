@@ -6,14 +6,16 @@ import { useChatStore } from "../store/chatStore";
 export const useSocket = () => {
     const  setCurrentUser  = useChatStore(state => state.setCurrentUser);
     const  setOnlineUsersList  = useChatStore(state => state.setOnlineUsersList);
+    const  setCurrentRoomId = useChatStore(state => state.setCurrentRoomId);
+    const  currentRoomId = useChatStore(state => state.currentRoomId);
+    const  addMessage = useChatStore(state => state.addMessage);
 
     useEffect(() => {
         socket.connect();
 
         // setCurrentUser(null);
 
-        //.on - argument - data we rcv
-        //.emit - argument - data we send
+        //.on - listenver/receiver
         socket.on("me", async(data) => { //here we used data instead of userId because on me event we receive a object as response
             const userId = data.userId;
 
@@ -64,11 +66,23 @@ export const useSocket = () => {
 
         socket.on("room_joined", (roomId) => {
             console.log("Room joined: ", roomId );
+            setCurrentRoomId(roomId);
+        })
+
+        socket.on("receive_message", (msg) => {
+            const roomId = useChatStore.getState().currentRoomId;
+            if(msg.roomId.toString() === roomId?.toString()){
+                useChatStore.getState().addMessage(msg);
+            }
+            
+            console.log("message received", {msg});
         })
 
         return () => {
             socket.off("me");
             socket.off("online_users");
+            socket.off("room_joined");
+            socket.off("receive_message");
             socket.disconnect();
         }
 
