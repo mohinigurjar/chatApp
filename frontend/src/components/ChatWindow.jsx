@@ -1,8 +1,27 @@
+import { useState, useEffect } from "react";
+import { useChatStore } from "../store/chatStore";
+
 const chatWindow = () => {
-    const [userSelected, setUserSelected] = useState(Boolean);
-    return(
+    const selectedUser = useChatStore(state => state.selectedUser);
+
+    return (
+    <div>
+        {selectedUser ? (
+        <h2>Chatting with {selectedUser.username}</h2>
+        ) : (
+        <p>Select a user</p>
+        )}
+
         <div>
-            {userSelected? <p>send message to selected user</p> : <p>select a user to send message</p>}
+            <input
+            type="text"
+            name="message"
+            placeholder="type a message here"
+            >
+            </input>
         </div>
-    )
-}
+    </div>
+    );
+    }
+
+export default chatWindow;

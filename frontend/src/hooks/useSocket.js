@@ -7,11 +7,10 @@ export const useSocket = () => {
     const  setCurrentUser  = useChatStore(state => state.setCurrentUser);
     const  setOnlineUsersList  = useChatStore(state => state.setOnlineUsersList);
 
-
     useEffect(() => {
         socket.connect();
 
-        setCurrentUser(null);
+        // setCurrentUser(null);
 
         //.on - argument - data we rcv
         //.emit - argument - data we send
@@ -74,11 +73,5 @@ export const useSocket = () => {
         }
 
     }, []);
-
-    const joinRoom = (otherUserId) => {
-    socket.emit("join_room", { otherUserId });
-    }
-
-    return { joinRoom } ;
 }
 

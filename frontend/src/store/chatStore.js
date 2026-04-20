@@ -4,8 +4,10 @@ export const useChatStore = create((set) => ({
     //states
     currentUser : null,
     onlineUsersList: [],
+    selectedUser: null,
 
     //state updaters
     setCurrentUser: (user) => set({currentUser: user}),
     setOnlineUsersList: (users) => set({onlineUsersList: users}),
+    setSelectedUser: (user) => set({selectedUser: user})
 }))

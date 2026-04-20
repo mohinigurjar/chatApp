@@ -1,14 +1,24 @@
 import { useChatStore } from "../store/chatStore";
 import { useSocket } from "../hooks/useSocket"
+import { joinRoom } from "./socketActions";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
     const currentUser = useChatStore(state => state.currentUser);
     const onlineUsersList = useChatStore(state => state.onlineUsersList);
-    const {joinRoom} = useSocket();
+    const selectedUser = useChatStore(state => state.selectedUser);
+    const setSelectedUser = useChatStore(state => state.setSelectedUser);
+    const Navigate = useNavigate();
+
 
     const handleSelectedUser = (user) => {
+        setSelectedUser(user);
         joinRoom(user._id); 
+
+        Navigate("/chatWindow");
     }
+
+    
 
     return (
         <div>
