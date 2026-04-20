@@ -6,12 +6,12 @@ const messageSchema = new mongoose.Schema({
         required: true,
         index: true,
     },
-    sender: {
+    senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true  
     },
-    receiver: {
+    receiverId: {
         type: mongoose.Schema.Types.ObjectId, //its the id of rcvr the unique id
         ref: 'User', //referencing the User model means the data(id) fetched from the User collection
         required: true  

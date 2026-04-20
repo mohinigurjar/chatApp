@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const userRouter = require('./routes/userRouter.js');
+const messageRouter = require('./routes/messageRouter.js');
 const connectDB = require('./config/db.js');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/users', userRouter);
+app.use('/api/messages', messageRouter);
 
 
 //create http server

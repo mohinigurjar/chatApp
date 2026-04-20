@@ -1,10 +1,10 @@
 const Message = require("../models/messages");
 
-const saveMessage = async({roomId, sender, receiver, message}) => {
+const saveMessage = async({roomId, senderId, receiverId, message}) => {
     return await Message.create({
         roomId,
-        sender,
-        receiver,
+        senderId,
+        receiverId,
         message
     })
     

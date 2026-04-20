@@ -108,8 +108,8 @@ module.exports = function(server) {
 
                 const messageData = await saveMessage({
                     roomId,
-                    sender: socket.userId,
-                    receiver: otherUserId,
+                    senderId: socket.userId,
+                    receiverId: otherUserId,
                     message,
                 })
 

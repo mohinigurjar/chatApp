@@ -4,9 +4,12 @@ import Dashboard from "./pages/Dashboard";
 import SignupPage from "./pages/SignupPage";
 import "./App.css";
 import Sidebar  from "./components/Sidebar";
+import ChatWindow from "./components/ChatWindow";
+import { useSocket } from "./hooks/useSocket"
 
 function App() {
   const isLoggedIn = true; // later you’ll replace this with real check
+  useSocket(); //used globally for listeners
 
   return (
     <Routes>
@@ -19,6 +22,7 @@ function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/dashboard" element={<Dashboard/>} />
       <Route path="/sidebar" element={<Sidebar />}></Route>
+      <Route path="/chatWindow/:userId" element={<ChatWindow/>}></Route>
     </Routes>
   );
 }
