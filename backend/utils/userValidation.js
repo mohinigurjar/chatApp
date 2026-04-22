@@ -20,4 +20,13 @@ const loginValidator = z.object({
     password: z.string().min(1) //not needed again as its set during register
 })
 
-module.exports = { signUpValidator, loginValidator };
+const updateProfileValidator = z.object({
+    newname: z.string().min(3).max(20).trim()
+})
+
+const changePasswordValidator = z.object({
+    oldPassword: passwordValidator,
+    newPassword: passwordValidator
+})
+
+module.exports = { signUpValidator, loginValidator, updateProfileValidator, changePasswordValidator };

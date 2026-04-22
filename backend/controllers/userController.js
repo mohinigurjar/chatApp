@@ -1,57 +1,13 @@
-const express = require('express');
 const User = require('../models/users.js');
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
-const bcrypt = require('bcrypt');
-
-
-const createUser = async(req, res) => {
-    const {username, email, password} = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({username, email, password: hashedPassword});
-        await newUser.save();
-        return res.status(201).json({message: 'User created successfully', user: newUser});
-    }catch(err) {
-        return res.status(500).json({error: 'Internal Server Error'});
-    }
-}
-
-const loginUser = async(req, res) => {
-    const {email, password} = req.body;
-
-    try {
-        const user = await User.findOne({email});
-        if(!user) {
-            return res.status(404).json({error: 'User not found'});
-        }
-        const isPasswordValid = await user.validatePassword(password);
-       
-        if(isPasswordValid) {
-            //if credentials are valid, generate JWT token
-            const token = await user.getJWT();
-
-            //store token in cookie                                                                      //secure: true for production with https
-            res.cookie('token', token, {expires : new Date(Date.now() + 7 * 86400000)}, {httpOnly: true, secure: false, sameSite: 'lax'});
-            return res.status(200).json({message: 'Login successful', token});
-            
-        }else{
-            return res.status(401).json({error: 'Invalid credentials'});
-        }
-    }catch(error) {
-        console.log(error);
-        return res.status(400).send({"ERROR ": + error.message});
-    }
-}
-
 const getUserProfile = async(req, res) => {
-    const { userId } = req.params;
-    
-    
+
+    const userId = req.user.id;
+
     try{
         const user = await User.findOne({ _id: userId});
-        // console.log(userId);
-
         if(!user){
             return res.status(404).json({message: 'user not found'});
         }
@@ -63,20 +19,98 @@ const getUserProfile = async(req, res) => {
     }
 }
 
-const getAllLoggedInUsersDetails = async(req, res) => {
-    const { ids } = req.body;
-
-    //prevent from getting bad ids like [], [{}] as they crash during query
-    const validIds = ids.filter((id) => 
-    mongoose.Types.ObjectId.isValid(id)
-    );
+const editUserProfile = async(req, res) => {
+    const userId = req.user.id;
+    const { newname } = req.body;
 
     try{
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({error: "User not found"});
+        }
+
+        user.username = newname;
+        await user.save();
+        res.status(200).json({message: "Profile successfully updated: ", user});   
+    }catch(error) {
+        res.status(500).json({error: "Internal Server error"});
+    }
+}
+
+const deleteUserProfile = async(req, res) => {
+    const userId = req.user.id;
+
+    try{
+        const deletedUser = await User.findByIdAndDelete(userId);
+        if(!deletedUser){
+            res.status(404).json({error: "User not found"});
+        }
+        res.status(200).json({message: "User deleted successfully", deletedUser});
+    }catch(error){
+        res.status(500).json({error: "Internal server error"});
+    }
+}
+
+const changePassword = async(req, res) => {
+    const userId = req.user.id;
+    
+    const { oldPassword, newPassword } = req.body;
+
+    console.log("resetting password");
+
+    try{
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.status(404).json({error: "User not found"});
+        }
+
+        console.log(user);
+
+        const isPasswordValid = await user.validatePassword(oldPassword);
+        if(!isPasswordValid){
+            res.status(400).json({message: "Invalid old password"});
+        }
+
+        if (oldPassword === newPassword) {
+            return res.status(400).json({ message: "New password must be different from old password"});
+        }
+
+        console.log(oldPassword, newPassword);
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+
+        console.log(user);
+
+        await user.save();
+        return res.status(200).json({message: "Password updated successfully"});
+        
+    }catch(error){
+        res.status(500).json({error: "Internal server error"});
+    }
+}
+
+const getAllUsersDetails = async(req, res) => {
+
+    const { ids } = req.body;
+
+    try{
+        if (!Array.isArray(ids)) {
+            return res.status(400).json({ error: "ids must be an array" });
+        }
+
+        //prevent from getting bad ids like [], [{}] as they crash during query
+        const validIds = ids.filter((id) => 
+        mongoose.Types.ObjectId.isValid(id)
+        );
+
+        if (validIds.length === 0) {
+            return res.status(400).json({ error: "No valid user IDs provided" });
+        }
+
         const users = await User.find({
             _id: { $in: validIds }
         });
-
-        console.log(users);
 
         res.status(200).json(users);
     }catch(error){
@@ -85,5 +119,4 @@ const getAllLoggedInUsersDetails = async(req, res) => {
     }
 }
 
-
-module.exports = { createUser, loginUser, getUserProfile, getAllLoggedInUsersDetails };
+module.exports = { getUserProfile, editUserProfile, deleteUserProfile, getAllUsersDetails, changePassword};

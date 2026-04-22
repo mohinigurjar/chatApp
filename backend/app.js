@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
-app.use('/api/users', userRouter);
+app.use('/api/users/profile', userRouter);
 app.use('/api/messages', messageRouter);
 app.use('/api/conversations', conversationRouter)
 
