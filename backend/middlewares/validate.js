@@ -1,10 +1,19 @@
 const validate = (schema) => (req, res, next) => {
-    try {
-        schema.parse(req.body);
-        next();
-    }catch(err) {
-        return res.status(400).json({ error: err.errors.map(e => e.message) });
+    console.log("middleware hit");
+    const result = schema.safeParse(req.body);
+
+    if (!result.success) {
+        return res.status(400).json({
+        errors: result.error.issues.map(e => ({
+            field: e.path[0],
+            message: e.message
+        }))
+        });
     }
+
+    req.body = result.data;
+    console.log(req.body);
+    next();
 }
 
 module.exports = validate;
