@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 const authRouter = require('./routes/authRouter.js');
 const userRouter = require('./routes/userRouter.js');
 const messageRouter = require('./routes/messageRouter.js');
-const conversationRouter = require('./routes/conversationRouter.js')
+const chatRouter = require('./routes/chatRouter.js')
 
 dotenv.config();
 const app = express();
@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/users/profile', userRouter);
 app.use('/api/messages', messageRouter);
-app.use('/api/conversations', conversationRouter)
+app.use('/api/chats', chatRouter)
 
 
 //create http server

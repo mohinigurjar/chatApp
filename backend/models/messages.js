@@ -1,26 +1,21 @@
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
-    roomId: {
+    chatId: {
         type: String,
         required: true,
         index: true,
     },
     senderId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: mongoose.Schema.Types.ObjectId, //its the id of sender the unique id
+        ref: 'User',  //referencing the User model means the data(id) fetched from the User collection
         required: true  
     },
-    receiverId: {
-        type: mongoose.Schema.Types.ObjectId, //its the id of rcvr the unique id
-        ref: 'User', //referencing the User model means the data(id) fetched from the User collection
-        required: true  
-    },
-    message: {
+    text: {
         type: String,
         required: true,
     }
-    }, {timestamps: true});
+}, {timestamps: true});
 
     const Message = mongoose.model('Message', messageSchema);
     module.exports = Message;
