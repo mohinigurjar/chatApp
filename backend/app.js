@@ -1,11 +1,14 @@
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
-const userRouter = require('./routes/userRouter.js');
-const messageRouter = require('./routes/messageRouter.js');
 const connectDB = require('./config/db.js');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
+
+const authRouter = require('./routes/authRouter.js');
+const userRouter = require('./routes/userRouter.js');
+const messageRouter = require('./routes/messageRouter.js');
+const chatRouter = require('./routes/chatRouter.js')
 
 dotenv.config();
 const app = express();
@@ -20,8 +23,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/users', userRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/users/profile', userRouter);
 app.use('/api/messages', messageRouter);
+app.use('/api/chats', chatRouter)
 
 
 //create http server
