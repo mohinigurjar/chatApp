@@ -1,56 +1,48 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useChatStore } from "../store/chatStore";
-import { joinRoom, sendMessage } from "./socketActions";
-import { getMessages, getUser } from "../services/api";
+import { createChat, sendMessage } from "./socketActions";
+import { getMessages} from "../services/api";
+import { getOtherUser } from "../utils/getOtherUser";
+import { getChatId } from "../utils/getChatId";
 
 const ChatWindow = () => {
-    const {userId} = useParams();
-    const selectedUser = useChatStore(state => state.selectedUser);
-    const setSelectedUser = useChatStore(state => state.setSelectedUser);
+    const setMessages = useChatStore(state => state.setMessages);
+
     const messages = useChatStore(state => state.messages);
     const currentUser = useChatStore(state => state.currentUser);
-    const setMessages = useChatStore(state => state.setMessages);
-    const currentRoomId = useChatStore(state => state.currentRoomId);
+    const selectedUser = useChatStore(state => state.selectedUser);
+    const chats = useChatStore(state => state.chats);
+    const currentChatId = useChatStore(state => state.currentChatId);
     const clearMessages = useChatStore(state => state.clearMessages);
 
     const [text, setText] = useState("");
-
+    
+    const otherUser = selectedUser;
 
     const handleSendMessage = () => {
-        if(!selectedUser|| !text.trim()) return;
-        sendMessage(selectedUser._id, text); //sender function from frontend
+        if(!otherUser || !text.trim()) return;
+        sendMessage(otherUser._id, text); //.emit - sender function from frontend
         setText("");
     }
 
     useEffect(() => {
-        if(!userId) return;
-        joinRoom(userId);
-    }, [userId]);
-
-    useEffect(() => {
-        if(!userId) return;
-
-        const fetchUser = async() => {
-            const res = await getUser(userId);
-            setSelectedUser(res.data.user);
-        };
-        fetchUser();
-    }, [userId]);
-
-    
+        if(!otherUser) return;
+        console.log("created chat with: ", otherUser)
+        createChat(otherUser._id);
+    }, [otherUser]);
 
     useEffect(() => {
 
-       if(!currentRoomId) return;
+       if(!currentChatId) return;
         
         clearMessages();
 
-        console.log("current room id  is: ", currentRoomId);
+        console.log("current chat id  is: ", currentChatId);
 
         const fetchMessages = async() => {
             try{
-                const res = await getMessages(currentRoomId); //api call to backend
+                const res = await getMessages(currentChatId); //api call to backend
                 const msgs = res.data
                 setMessages(msgs); //state in store 
             }catch(error){
@@ -59,17 +51,17 @@ const ChatWindow = () => {
         };
 
         fetchMessages();
-    }, [currentRoomId]);
+    }, [currentChatId]);
 
     return (
     <div>
-        {selectedUser ? (
-        <h2>Chatting with {selectedUser.username}</h2>
+        {otherUser ? (
+        <h2>Chatting with {otherUser.username}</h2>
         ) : (
         <p>Select a user</p>
         )}
 
-        {/* messages UI (we’ll improve later) */}
+        {/* messages UI */}
             <div className="flex flex-col gap-2">
                 {messages.map((msg, index) => {
                     const isMe = msg.senderId?.toString() === currentUser?._id.toString();
@@ -85,7 +77,7 @@ const ChatWindow = () => {
                                     : "bg-gray-300 text-black"
                                 }`}
                             >
-                            {msg.message}
+                            {msg.text}
                             <div className="text-xs opacity-70">
                                 {new Date(msg.createdAt).toLocaleString()}
                             </div>

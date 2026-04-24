@@ -1,12 +1,11 @@
 const { Server } = require("socket.io"); //create a websocket server
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-// const cors = require("cors");
 const cookie = require("cookie"); //parses cookies from request header
 const Message = require("../models/messages");
-const {saveMessage} = require("../services/messageService")
+const Chat = require("../models/Chats");
 
-function getRoomId(user1, user2){
+function getChatId(user1, user2){
     return [user1, user2].sort().join("_");
 }
 
@@ -76,46 +75,49 @@ module.exports = function(server) {
         //sending userid
         socket.emit("me", { userId: socket.userId });
 
-
-        socket.on("all_users", ({}) => {
-            const countAll = onlineUsers.size;
-            const users = Array.from(onlineUsers.keys());
-            console.log("All users", countAll);
-            console.log(users);
-
-        })
-
-        socket.on("join_room", ({ otherUserId }) => {
-            const roomId = getRoomId(socket.userId, otherUserId);
-            socket.join(roomId);
-            console.log(`User ${socket.userId} joined room ${roomId}`);
-            console.log("JOIN ROOM:");
+        socket.on("create_chat", ({ otherUserId }) => {
+            const chatId = getChatId(socket.userId, otherUserId);
+            socket.join(chatId);
+            console.log(`User ${socket.userId} joined chat ${chatId}`);
+            console.log("JOIN CHAT:");
             console.log("User:", socket.userId);
             console.log("Other:", otherUserId);
-            console.log("Room:", roomId);
-            socket.emit("room_joined", roomId);
+            console.log("ChatId:", chatId);
+            socket.emit("chat_joined", chatId);
         })
 
-        socket.on("send_message", async({ otherUserId, message }) => {
+        socket.on("send_message", async({ otherUserId, text }) => {
+            if (!text || !otherUserId) return;
             try{
                 console.log("send_message working");
-                const roomId = getRoomId(socket.userId, otherUserId);
+                const chatId = getChatId(socket.userId, otherUserId);
                 console.log("MESSAGE EVENT:");
                 console.log("From:", socket.userId);
                 console.log("To:", otherUserId);
-                console.log("Room:", roomId);
-                console.log("Message:", message);
+                console.log("ChatId:", chatId);
+                console.log("Message:", text);
 
-                const messageData = await saveMessage({
-                    roomId,
+                const messageData = await Message.create({
+                    chatId,
                     senderId: socket.userId,
-                    receiverId: otherUserId,
-                    message,
+                    text,
                 })
+
+                await Chat.findByIdAndUpdate(
+                    chatId, {
+                    $set: {
+                        lastMessage: text,
+                        lastMessageAt: new Date()
+                    },
+                    $setOnInsert: {
+                        participants: [socket.userId, otherUserId]
+                    }
+                }, {upsert: true, new: true});
 
                 console.log("message saved");
 
-                io.to(roomId).emit("receive_message", messageData);
+                io.to(chatId).emit("receive_message", messageData);
+                console.log("Emitting to chat: ", chatId);
 
             }catch(error){
                 console.log(error.message);
@@ -147,5 +149,3 @@ module.exports = function(server) {
         });
     });
 }
-
-//todo: create fronteend for chats
