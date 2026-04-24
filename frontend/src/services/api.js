@@ -1,7 +1,12 @@
 import  axios  from 'axios';
 
+const authAPI = axios.create({
+    baseURL: 'http://localhost:5000/api/auth',
+    withCredentials: true
+})
+
 const userAPI = axios.create({
-    baseURL: 'http://localhost:5000/api/users',
+    baseURL: 'http://localhost:5000/api/users/profile',
     withCredentials: true
 })
 
@@ -10,14 +15,34 @@ const messagesAPI = axios.create({
     withCredentials: true
 })
 
-export const loginUser = (data) => userAPI.post('/login', data);
-export const signupUser = (data) => userAPI.post('/signup', data);
-export const getUser = (userId) => {
-    return userAPI.get(`/profile/${userId}`);
+const chatsAPI = axios.create({
+    baseURL: 'http://localhost:5000/api/chats',
+    withCredentials: true
+})
+
+//authAPIs
+export const loginUser = (data) => authAPI.post('/login', data);
+export const signupUser = (data) => authAPI.post('/signup', data);
+export const logout = () => authAPI.post('/logout');
+
+//userAPIs
+export const getUserProfile = () => userAPI.get('/me');
+export const editUserProfile = (newname) => userAPI.patch('/edit', { newname });
+export const deleteUserProfile = () => userAPI.delete('/delete');
+export const changePassword = (data) => userAPI.patch('/changePassword', data);
+export const getUsersByIds = async(ids) => {
+    return await userAPI.post('/bulk', { ids });
 }
-export const getUserByIds = async(ids) => {
-    return await userAPI.post('/profile/bulk', { ids });
+
+//messagesAPIs
+export const getMessages = async(chatId) => {
+    return await messagesAPI.post('/getAll', { chatId });
 }
-export const getMessages = async(roomId) => {
-    return await messagesAPI.post('/getMessages', { roomId });
+export const sendMessage = async(data) => {
+    return await messagesAPI.post('/send', data);
+}
+
+//chatsAPIs
+export const getChatsList = async() => {
+    return await chatsAPI.get('/chatsList');
 }

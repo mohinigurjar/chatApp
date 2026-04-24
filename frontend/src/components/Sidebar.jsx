@@ -1,19 +1,18 @@
 import { useChatStore } from "../store/chatStore";
-import { useSocket } from "../hooks/useSocket"
-import { joinRoom } from "./socketActions";
 import { useNavigate } from "react-router-dom";
+import ChatsList from "./ChatsList";
+import ContactsList from "./ContactsList";
 
 const Sidebar = () => {
     const currentUser = useChatStore(state => state.currentUser);
-    const onlineUsersList = useChatStore(state => state.onlineUsersList);
-    const setSelectedUser = useChatStore(state => state.setSelectedUser);
-    const Navigate = useNavigate();
+    const activeTab = useChatStore(state => state.activeTab);
+    const setActiveTab = useChatStore(state => state.setActiveTab);
 
 
-    const handleSelectedUser = (user) => {
-        setSelectedUser(user);
-        Navigate(`/chatWindow/${user._id}`);
-    }
+    // const handleSelectedUser = (user) => {
+    //     setSelectedUser(user);
+    //     Navigate(`/chatWindow/${user._id}`);
+    // }
 
     
 
@@ -30,30 +29,36 @@ const Sidebar = () => {
                     </a>
                 </div>
             </div>
+
+
         <hr></hr>
-            <div className="flex justify-between">
-                <button>Chats</button>
-                <button>Contacts</button>
+            <div className="flex justify-between p-2">
+                <button
+                    onClick={() => setActiveTab("chats")}
+                    className={activeTab === "chats" ? "font-bold" : ""}
+                >
+                    Chats
+                </button>
+
+                <button
+                    onClick={() => setActiveTab("contacts")}
+                    className={activeTab === "contacts" ? "font-bold" : ""}
+                >
+                    Contacts
+                </button>
             </div>
 
         <hr></hr>
-
-{/* we will use chats? chats : contacts logic here to open both */}
-            <div className="flex justify-between">
-                <div>
-                        <h3>Online users: </h3>
-                        <ul>
-                            {onlineUsersList
-                            .filter(user => currentUser?._id && user._id.toString() !== currentUser._id.toString())
-                            .map((user) => <li 
-                            key={user._id}
-                            onClick={() => handleSelectedUser(user)}
-                            className="cursor-pointer">{user.username}</li>)}
-                        </ul>
-                    </div>
-                <div>online status</div>
+    
+        {/* CONDITIONAL RENDERING OF LISTS */}
+            <div className="flex-1 overflow-y-auto">
+                {activeTab === "chats" ? (
+                    <ChatsList />
+                ) : (
+                    <ContactsList />
+                )}
             </div>
-           <hr></hr>
+           
                 
             
         </div>

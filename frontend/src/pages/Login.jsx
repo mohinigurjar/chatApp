@@ -26,7 +26,7 @@ const Login = () => {
 
         try{
             const response = await loginUser(data);
-            navigate("/dashboard");
+            navigate("/chat");
             console.log("Login successful:", response.data);
         } catch(err) {
             setError("Invalid credentials");

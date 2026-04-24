@@ -1,4 +1,4 @@
-import { getUser, getUserByIds } from "../services/api";
+import { getUserProfile, getUsersByIds } from "../services/api";
 import { socket } from "../socket"
 import { useEffect } from "react";
 import { useChatStore } from "../store/chatStore";
@@ -6,15 +6,11 @@ import { useChatStore } from "../store/chatStore";
 export const useSocket = () => {
     const  setCurrentUser  = useChatStore(state => state.setCurrentUser);
     const  setOnlineUsersList  = useChatStore(state => state.setOnlineUsersList);
-    const  setCurrentRoomId = useChatStore(state => state.setCurrentRoomId);
-    const  currentRoomId = useChatStore(state => state.currentRoomId);
-    const  addMessage = useChatStore(state => state.addMessage);
+    const  setCurrentChatId = useChatStore(state => state.setCurrentChatId);
 
     useEffect(() => {
         socket.connect();
-
-        // setCurrentUser(null);
-
+        
         //.on - listenver/receiver
         socket.on("me", async(data) => { //here we used data instead of userId because on me event we receive a object as response
             const userId = data.userId;
@@ -25,7 +21,7 @@ export const useSocket = () => {
             }
 
             try{
-                const res = await getUser(userId); 
+                const res = await getUserProfile(); 
                 const user = res.data.user; //.user because from backet we get object like { user: { username: "", email: "",...}}
                 console.log("Current user is: ", user);
                 setCurrentUser(user);
@@ -54,7 +50,7 @@ export const useSocket = () => {
             console.log("clean Ids are: ", cleanIds);
 
             try{
-                const res = await getUserByIds(cleanIds);
+                const res = await getUsersByIds(cleanIds);
                 const users = res.data;
                 console.log("Online users list: ", users);
                 setOnlineUsersList(users);
@@ -64,15 +60,16 @@ export const useSocket = () => {
 
         })
 
-        socket.on("room_joined", (roomId) => {
-            console.log("Room joined: ", roomId );
-            setCurrentRoomId(roomId);
+        socket.on("chat_joined", (chatId) => {
+            console.log("Joining chat: ", chatId );
+            setCurrentChatId(chatId);
         })
 
         socket.on("receive_message", (msg) => {
-            const roomId = useChatStore.getState().currentRoomId;
-            if(msg.roomId.toString() === roomId?.toString()){
-                useChatStore.getState().addMessage(msg);
+            const { currentChatId, addMessage } = useChatStore.getState();
+            
+            if(msg.chatId?.toString() === currentChatId?.toString()){
+                addMessage(msg);
             }
             
             console.log("message received", {msg});
@@ -81,7 +78,7 @@ export const useSocket = () => {
         return () => {
             socket.off("me");
             socket.off("online_users");
-            socket.off("room_joined");
+            socket.off("chat_joined");
             socket.off("receive_message");
             socket.disconnect();
         }
