@@ -1,22 +1,22 @@
 import  axios  from 'axios';
 
 const authAPI = axios.create({
-    baseURL: 'http://localhost:5000/api/auth',
+    baseURL: 'https://chatapp-bceh.onrender.com/api/auth',
     withCredentials: true
 })
 
 const userAPI = axios.create({
-    baseURL: 'http://localhost:5000/api/users/profile',
+    baseURL: 'https://chatapp-bceh.onrender.com/api/users/profile',
     withCredentials: true
 })
 
 const messagesAPI = axios.create({
-    baseURL: 'http://localhost:5000/api/messages',
+    baseURL: 'https://chatapp-bceh.onrender.com/api/messages',
     withCredentials: true
 })
 
 const chatsAPI = axios.create({
-    baseURL: 'http://localhost:5000/api/chats',
+    baseURL: 'https://chatapp-bceh.onrender.com/api/chats',
     withCredentials: true
 })
 
