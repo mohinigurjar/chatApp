@@ -35,7 +35,12 @@ const loginUser = async(req, res) => {
             const token = await user.getJWT();
 
             //store token in cookie                                                                      //secure: true for production with https
-            res.cookie('token', token, {expires : new Date(Date.now() + 7 * 86400000)}, {httpOnly: true, secure: false, sameSite: 'lax'});
+            res.cookie('token', token, {
+                expires: new Date(Date.now() + 7 * 86400000),
+                httpOnly: true,
+                secure: true,  // Change to true since you're using HTTPS on Render
+                sameSite: 'lax'
+            });
             return res.status(200).json({message: 'Login successful', token});
             
         }else{
