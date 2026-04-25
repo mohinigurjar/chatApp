@@ -15,7 +15,7 @@ const app = express();
 connectDB();
 
 app.use(cors({
-    origin: [ "http://localhost:5173", "https://chatapp-bceh.onrender.com"],
+    origin: [ "http://localhost:5173", "https://chatapp-bceh.onrender.com", "https://chat-app-ubhn.vercel.app"],
     credentials: true
 }))
 
