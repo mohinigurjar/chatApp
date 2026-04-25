@@ -46,6 +46,7 @@ const  ChatsList = () => {
                     <UserRow
                       key={chat._id} //unique key per chat - chatid
                       user={otherUser} //show opposite user
+                      lastMessage={chat.lastMessage}
                       onClick={() => {
                         setSelectedUser(otherUser);
                         console.log("opening chat:", chat._id); // debug log
