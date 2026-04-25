@@ -18,7 +18,7 @@ module.exports = function(server) {
 
     const io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173", //allows connections from frontend (localhost:3000)
+            origin:  [ "http://localhost:5173", "https://chatapp-bceh.onrender.com", "https://chat-app-ubhn.vercel.app"], //allows connections from frontend (localhost:3000)
             credentials: true, //allow cookies to be sent with socket requests
         }
     })
