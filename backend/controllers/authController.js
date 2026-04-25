@@ -39,7 +39,7 @@ const loginUser = async(req, res) => {
                 expires: new Date(Date.now() + 7 * 86400000),
                 httpOnly: true,
                 secure: true,  // Change to true since you're using HTTPS on Render
-                sameSite: 'lax'
+                sameSite: 'none'
             });
             return res.status(200).json({message: 'Login successful', token});
             
