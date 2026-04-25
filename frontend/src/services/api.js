@@ -1,22 +1,24 @@
 import  axios  from 'axios';
 
+const url = import.meta.env.VITE_BE_URL
+
 const authAPI = axios.create({
-    baseURL: 'https://chatapp-bceh.onrender.com/api/auth',
+    baseURL: `${url}/api/auth`,
     withCredentials: true
 })
 
 const userAPI = axios.create({
-    baseURL: 'https://chatapp-bceh.onrender.com/api/users/profile',
+    baseURL: `${url}/api/users/profile`,
     withCredentials: true
 })
 
 const messagesAPI = axios.create({
-    baseURL: 'https://chatapp-bceh.onrender.com/api/messages',
+    baseURL: `${url}/api/messages`,
     withCredentials: true
 })
 
 const chatsAPI = axios.create({
-    baseURL: 'https://chatapp-bceh.onrender.com/api/chats',
+    baseURL: `${url}/api/chats`,
     withCredentials: true
 })
 
