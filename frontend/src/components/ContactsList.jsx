@@ -75,6 +75,7 @@ const ContactsList = () => {
                 <UserRow
                 key={user._id}
                 user={user}
+                lastMessage={null}
                 onClick={() => {
                     console.log("new chat created")
                     setSelectedUser(user);
