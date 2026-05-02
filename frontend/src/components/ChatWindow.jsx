@@ -5,6 +5,8 @@ import { createChat, sendMessage } from "./socketActions";
 import { getMessages} from "../services/api";
 import { getOtherUser } from "../utils/getOtherUser";
 import { getChatId } from "../utils/getChatId";
+import { isOnline } from "../utils/isOnline";
+import { useAuthStore } from "../store/authStore";
 
 const ChatWindow = () => {
     const messagesEndRef = useRef(null);
@@ -12,7 +14,7 @@ const ChatWindow = () => {
     const setMessages = useChatStore(state => state.setMessages);
 
     const messages = useChatStore(state => state.messages);
-    const currentUser = useChatStore(state => state.currentUser);
+    const currentUser = useAuthStore(state => state.currentUser);
     const selectedUser = useChatStore(state => state.selectedUser);
     const chats = useChatStore(state => state.chats);
     const currentChatId = useChatStore(state => state.currentChatId);
@@ -36,7 +38,8 @@ const ChatWindow = () => {
 
     useEffect(() => {
 
-       if(!currentChatId) return;
+       if(!currentChatId || !currentUser) return;
+       let isActive = true;
         
         clearMessages();
 
@@ -45,7 +48,9 @@ const ChatWindow = () => {
         const fetchMessages = async() => {
             try{
                 const res = await getMessages(currentChatId); //api call to backend
-                const msgs = res.data
+                if(!isActive) return;
+
+                const msgs = res.data;
                 setMessages(msgs); //state in store 
             }catch(error){
                 console.log("Error fetching messages: ", error);
@@ -53,7 +58,11 @@ const ChatWindow = () => {
         };
 
         fetchMessages();
-    }, [currentChatId]);
+
+        return () => {
+            isActive = false;
+        }
+    }, [currentChatId, currentUser]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({behaviour: "smooth"});
@@ -66,7 +75,7 @@ const ChatWindow = () => {
         <div className="p-4 border-b bg-white flex items-center gap-3">
             {otherUser ? (
             <div className="flex items-center gap-3">
-                <Avatar name={otherUser.username} isOnline={true}/>
+                <Avatar name={otherUser.username} isOnline={isOnline(otherUser)}/>
 
                 <div className="flex flex-col">
                     <h2 className="text-lg font-semibold text-gray-800">{otherUser.username.toUpperCase()} </h2>

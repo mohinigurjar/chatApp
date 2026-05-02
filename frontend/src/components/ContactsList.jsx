@@ -3,6 +3,7 @@ import UserRow from './UserRow';
 import { useChatStore } from "../store/chatStore";
 import { getChatId } from '../utils/getChatId';
 import { getChatsList, getUsersByIds } from '../services/api';
+import { useAuthStore } from "../store/authStore";
 
 
 const ContactsList = () => {
@@ -11,7 +12,7 @@ const ContactsList = () => {
     const setSelectedUser = useChatStore(state => state.setSelectedUser);
 
     const onlineUsersList = useChatStore(state => state.onlineUsersList);
-    const currentUser = useChatStore(state => state.currentUser);
+    const currentUser = useAuthStore(state => state.currentUser);
     const contacts = useChatStore(state => state.contacts);
     
 

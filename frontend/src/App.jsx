@@ -1,32 +1,44 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import LoginPage from "./pages/LoginPage";
-import Dashboard from "./pages/Dashboard";
 import SignupPage from "./pages/SignupPage";
-import "./App.css";
-import Sidebar  from "./components/Sidebar";
-import ChatWindow from "./components/ChatWindow";
 import { useSocket } from "./hooks/useSocket"
-import ChatsList from "./components/ChatsList";
+import { useAuthStore } from "./store/authStore"
 import ChatPage from "./pages/ChatPage";
+import "./App.css";
+
 
 function App() {
-  const isLoggedIn = true; // later you’ll replace this with real check
+  const { currentUser, loading, checkAuth, initialized } = useAuthStore();
+  
   useSocket(); //used globally for listeners
+
+  useEffect(()=> {
+    checkAuth();
+  }, [])
+
+  console.log("initialized is", initialized);
+
+  if (!initialized) return <div>Loading...</div>;
 
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+
+      <Route 
+        path="/login" 
+        element={currentUser ? <Navigate to="/chat" replace /> : <LoginPage />} 
+      />
+
+      <Route
+        path="/signup"
+        element={currentUser ? <Navigate to="/chat" replace /> : <SignupPage />}
+      />
+
       <Route
         path="/chat"
-        element={isLoggedIn ? <ChatPage /> : <Navigate to="/login" />}
+        element={currentUser ? <ChatPage /> : <Navigate to="/login" replace />}
       />
-      <Route path="*" element={<Navigate to="/login" />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/dashboard" element={<Dashboard/>} />
-      {/* <Route path="/sidebar" element={<Sidebar />}></Route>
-      <Route path="/chatWindow/:userId" element={<ChatWindow/>}></Route> */}
-      <Route path="/chat" element={<ChatPage/>}/>
-      
+      <Route path="*" element={<Navigate to="/login" />} />      
     </Routes>
   );
 }
