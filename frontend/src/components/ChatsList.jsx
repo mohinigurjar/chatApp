@@ -4,6 +4,7 @@ import { useEffect } from "react";
 //fetch chats and show them here in the chats
 import { getChatsList } from "../services/api";
 import { useChatStore } from "../store/chatStore";
+import { useAuthStore } from "../store/authStore";
 import { getOtherUser } from "../utils/getOtherUser";
 
 const  ChatsList = () => {
@@ -12,9 +13,11 @@ const  ChatsList = () => {
     const setSelectedUser = useChatStore(state => state.setSelectedUser);
 
     const chats = useChatStore(state => state.chats);
-    const currentUser = useChatStore(state => state.currentUser);
+    const currentUser = useAuthStore(state => state.currentUser);
+    const initialized = useAuthStore(state => state.initialized);
 
     useEffect(() => {
+        if(!initialized || !currentUser) return;
         console.log("chatList mounted");
 
         const fetchChats = async() => {
@@ -29,11 +32,13 @@ const  ChatsList = () => {
     }
 
     fetchChats();
-    }, [currentUser]);
+    }, [currentUser, initialized]);
 
     if (!chats || !currentUser) {
         return <div>Loading chats...</div>;
     }
+
+    console.log("chat isds are", chats.map(c => c._id));
     
 
     return(

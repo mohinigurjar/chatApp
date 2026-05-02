@@ -1,6 +1,7 @@
 import  axios  from 'axios';
 
 const url = import.meta.env.VITE_BE_URL
+// const url = "http://localhost:5000"
 
 const authAPI = axios.create({
     baseURL: `${url}/api/auth`,
@@ -28,7 +29,10 @@ export const signupUser = (data) => authAPI.post('/signup', data);
 export const logout = () => authAPI.post('/logout');
 
 //userAPIs
-export const getUserProfile = () => userAPI.get('/me');
+export const getUserProfile = () => {
+    console.log("getme api called");
+    return userAPI.get('/me');
+}
 export const editUserProfile = (newname) => userAPI.patch('/edit', { newname });
 export const deleteUserProfile = () => userAPI.delete('/delete');
 export const changePassword = (data) => userAPI.patch('/changePassword', data);

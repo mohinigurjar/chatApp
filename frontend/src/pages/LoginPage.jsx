@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { loginUser } from '../services/api'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
 
 
 const LoginPage = () => {
@@ -10,6 +11,7 @@ const LoginPage = () => {
     })
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { login } = useAuthStore();
 
     const onChangeHandler = (e) => {
         setData({...data, [e.target.name] : e.target.value})
@@ -25,9 +27,7 @@ const LoginPage = () => {
         }
 
         try{
-            const response = await loginUser(data);
-            navigate("/chat");
-            console.log("Login successful:", response.data);
+            await login(data);
         } catch(err) {
             setError("Invalid credentials");
             console.error(err);
@@ -93,11 +93,11 @@ const LoginPage = () => {
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-4">
           Don’t have an account?{" "}
-          <a href="/signup">
+          <Link to="/signup">
             <span className="text-blue-500 cursor-pointer hover:underline">
             Sign up
           </span>
-          </a>
+          </Link>
         </p>
 
       </div>

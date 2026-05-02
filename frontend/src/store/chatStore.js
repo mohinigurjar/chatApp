@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export const useChatStore = create((set) => ({
     //states
-    currentUser : null,
+    // currentUser : null,
     selectedUser : null,
     onlineUsersList: [],
 
@@ -13,7 +13,7 @@ export const useChatStore = create((set) => ({
     activeTab: 'chats',
 
     //state updaters
-    setCurrentUser: (user) => set({currentUser: user}),
+    // setCurrentUser: (user) => set({currentUser: user}),
     setSelectedUser: (user) => set({selectedUser: user}),
     setOnlineUsersList: (users) => set({onlineUsersList: users}),
     setCurrentChatId: (id) => set({currentChatId: id}),
