@@ -15,6 +15,8 @@ module.exports = function(server) {
     //storing the online users
     const onlineUsers = new Map();
 
+    //timestamps of the recent msgs sent
+    const messageTracker = new Map();
 
     const io = new Server(server, {
         cors: {
@@ -51,17 +53,21 @@ module.exports = function(server) {
     //runs if authentication passed
     //socket connection
     io.on("connection", (socket) => {
-        // console.log(`User connected: ${socket.userId}`); //access userId attached in auth middlware to identify the user
+        // console.log(`User connected at first : ${socket.userId}`); //access userId attached in auth middlware to identify the user
 
         const userId = socket.userId; //get userid from socket object to track online users
         
-        //store multiple socket ids for a single user if user opens multiple tabs
-        // Online users = Map { userId1: Set{socketId1, socketId2}, userId2: Set{socketId3} }
         if(!onlineUsers.has(userId)) {
             onlineUsers.set(userId, new Set());
         }
 
-        onlineUsers.get(userId).add(socket.id);
+        const sockets = onlineUsers.get(userId).add(socket.id);
+
+        if (sockets.size >= 3) {
+        sockets.delete(socket.id);
+        socket.disconnect();
+        return;
+    }
 
         console.log("User connected: ", userId);
         console.log("Users online: ", onlineUsers.size);
@@ -88,14 +94,25 @@ module.exports = function(server) {
 
         socket.on("send_message", async({ otherUserId, text }) => {
             if (!text || !otherUserId) return;
+
+            const userId = socket.userId;
+            const now = Date.now();
+
+            const timestamps = messageTracker.get(userId) || [];
+            const recent = timestamps.filter(t => now - t < 2000);
+
+            //soft throttle
+            if(recent.length >= 20) {
+                return;
+            }
+
+            recent.push(now);
+            messageTracker.set(userId, recent);
+
+
             try{
                 console.log("send_message working");
                 const chatId = getChatId(socket.userId, otherUserId);
-                console.log("MESSAGE EVENT:");
-                console.log("From:", socket.userId);
-                console.log("To:", otherUserId);
-                console.log("ChatId:", chatId);
-                console.log("Message:", text);
 
                 const messageData = await Message.create({
                     chatId,
