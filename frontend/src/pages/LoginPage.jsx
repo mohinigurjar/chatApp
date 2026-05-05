@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { loginUser } from '../services/api'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 
@@ -27,10 +26,17 @@ const LoginPage = () => {
         }
 
         try{
-            await login(data);
+          await login(data);
         } catch(err) {
+
+          const status = err?.response?.status;
+          if(status == 429){
+            setError("Too many login attempts. Try again after few minutes");
+          }
+          else{
             setError("Invalid credentials");
-            console.error(err);
+          }
+          console.error(err);
         }
 
     }
@@ -81,6 +87,7 @@ const LoginPage = () => {
           {/* Button */}
           <button
             type="submit"
+            disabled={!data.email || !data.password}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg text-sm font-medium transition"
             >
             Login
@@ -88,7 +95,7 @@ const LoginPage = () => {
 
         </form>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-4">

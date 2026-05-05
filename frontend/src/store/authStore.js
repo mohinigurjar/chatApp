@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { loginUser, logout, getUserProfile } from "../services/api.js"
+import { loginUser, logout, getUserProfile, editUserProfile, changePassword } from "../services/api.js"
 
 export const useAuthStore = create((set) => ({
     currentUser: null,
@@ -23,14 +23,51 @@ export const useAuthStore = create((set) => ({
     },
 
     login: async(data) => {
-        await loginUser(data);
-        const res = await getUserProfile();
-        set({currentUser: res.data.user});
+        try{
+            await loginUser(data);
+            const res = await getUserProfile();
+            console.log("from authstore: ", res.data.user)
+            set({currentUser: res.data.user});
+        }catch(error){
+            console.log("Login failed ", error);
+            throw error;
+        }
     },
 
     logout: async() => {
         await logout();
         set({currentUser: null});
+    },
+
+    editUsername: async(newname) => {
+        try{
+            const res = await editUserProfile(newname);
+            set((state) => ({
+                currentUser: {
+                    ...state.currentUser,
+                    username: res.data.user.username
+                }
+            }));
+        }catch(error){
+            console.log("Error updating profile", error)
+            throw error;
+        }
+    },
+
+    editPassword: async(oldPassword, newPassword) => {
+        try{
+            const res = await changePassword({oldPassword, newPassword});
+            console.log(res.data.user);
+            set((state) => ({
+                currentUser: {
+                    ...state.currentUser,
+                    password: res.data.user.password
+                }
+            }));
+        }catch(error){
+            console.log("Error updating password: ", error);
+            throw error;
+        }
     }
 
 }));
