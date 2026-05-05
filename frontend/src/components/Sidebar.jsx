@@ -1,24 +1,15 @@
-import { useNavigate, Link } from 'react-router-dom'
 import { useChatStore } from "../store/chatStore";
 import Avatar from "./Avatar";
 import ChatsList from "./ChatsList";
 import ContactsList from "./ContactsList";
 import { useAuthStore } from "../store/authStore";
+import UserMenu from "./UserMenu";
 
 const Sidebar = () => {
     const currentUser = useAuthStore(state => state.currentUser);
     const activeTab = useChatStore(state => state.activeTab);
 
     const setActiveTab = useChatStore(state => state.setActiveTab);
-
-    const { logout } = useAuthStore();
-    const navigate = useNavigate();
-
-    const handleLogout = async() => {
-        await logout();
-        navigate("/login");
-
-    }
 
     return (
         <div className="fixed left-0 top-0 h-screen w-[300px] bg-white border-r flex flex-col">
@@ -33,13 +24,7 @@ const Sidebar = () => {
                 </div>
 
                 <div>
-                    
-                      <button 
-                      onClick = {handleLogout}
-                      className="text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                        logout
-                      </button>
-                    
+                    <UserMenu/>   
                 </div>
 
             </div>
